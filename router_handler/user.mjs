@@ -2,6 +2,8 @@
 import db from "../db/index.mjs";
 import bcrypt from "bcryptjs";
 import { userBodySchema } from "../schema/user.mjs";
+import jwt from "jsonwebtoken";
+import { expiredTime, secretKey } from "../config.mjs"; // 生成和验证token的密钥
 
 // 注册处理函数
 export const register = (req, res) => {
@@ -53,16 +55,23 @@ export const login = (req, res) => {
       }
       // 当数据库里查不到该数据时
       if (sqlResult.length !== 1) {
-        return res.cc("登录失败");
+        return res.cc("用户不存在！");
       }
       // 判断 传来的密码 是否与 数据库的密码 相同
       if (bcrypt.compareSync(userInfo.password, sqlResult[0].password)) {
-        console.log("ok");
+        // 把查询到的用户信息中的 头像和 密码的值剔除掉
+        const user = { ...sqlResult[0], password: "", user_pic: "" };
+        // 生成token
+        const token = jwt.sign(user, secretKey, {
+          expiresIn: expiredTime,
+        });
         return res.send({
           status: 0,
+          message: "登录成功",
+          token: `Bearer ${token}`,
         });
       } else {
-        return res.cc("密码不对");
+        return res.cc("密码错误，登录失败");
       }
     });
   }

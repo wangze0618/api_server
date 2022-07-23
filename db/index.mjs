@@ -7,6 +7,7 @@ const db = mysql.createPool({
   user: "root",
   password: "0618",
   database: "my_db_01",
+  charset: "utf8mb4", // 支持emoji😄
 });
 
 export default db;
