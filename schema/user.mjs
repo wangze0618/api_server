@@ -15,11 +15,6 @@ export const userQuerySchema = Joi.object({
   age: Joi.number().integer().min(1).max(100).required(),
 });
 
-// 校验 req.params的数据
-export const userParamsSchema = Joi.object({
-  id: Joi.number().integer().min(0).required(),
-});
-
 // 校验用户更新基本信息 不包括密码和头像
 export const userUpdateBody = Joi.object({
   // 这里的id不需要了，因为直接从token里面获取到id，原项目是前端ajax获取数据时会获取id
@@ -49,4 +44,24 @@ export const validatePostBase64 = Joi.object({
 export const validateAddCates = Joi.object({
   name: Joi.string().required(),
   alias: Joi.string().alphanum().required(),
+});
+
+// 根据id删除文章 校验 req.params的id
+export const articleId = Joi.object({
+  id: Joi.number().integer().min(0).required(),
+});
+
+// 根据id 来更新文章分类
+export const updateArticleCateById = Joi.object({
+  id: Joi.number().integer().min(0).required(),
+  name: Joi.string().required(),
+  alias: Joi.string().alphanum().required(),
+});
+
+// 定义 标题、分类Id、内容、发布状态 的验证规则
+export const validateAddArticle = Joi.object({
+  title: Joi.string().required(),
+  cate_id: Joi.number().integer().min(1).required(),
+  content: Joi.string().allow("").required(),
+  state: Joi.string().valid("已发布", "草稿").required(),
 });

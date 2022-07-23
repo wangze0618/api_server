@@ -1,11 +1,10 @@
 import express from "express";
-import { addCates, getArticleCates } from "../router_handler/article.mjs";
-
+import { newArticle } from "../router_handler/article.mjs";
+import multer from "multer";
+import path from "path";
+const filePath = path.join("__dirname", "../uploads");
+const upload = multer({ dest: filePath });
 const router = express.Router();
-// 获取文章分类列表
-router.get("/cates", getArticleCates);
-
-// 新增文章分类
-router.post("/addCates", addCates);
+router.post("/add", upload.single("cover_img"), newArticle);
 
 export default router;

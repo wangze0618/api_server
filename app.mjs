@@ -2,8 +2,11 @@ import express from "express";
 import cors from "cors";
 import userRouter from "./router/user.mjs";
 import userInfoRouter from "./router/userinfo.mjs";
-import articleCateRouter from "./router/article.mjs";
+import articleCateRouter from "./router/artcate.mjs";
+import articleRouter from "./router/article.mjs";
 import Joi from "joi";
+import multer from "multer";
+
 import { expressjwt } from "express-jwt";
 import { secretKey } from "./config.mjs";
 const port = 9900;
@@ -12,6 +15,7 @@ const app = express();
 app.use(cors("*"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use("/uploads", express.static("/uploads"));
 
 // [优化]封装res.send()报错
 app.use((req, res, next) => {
@@ -36,7 +40,7 @@ app.use(
 app.use("/api", userRouter);
 app.use("/my", userInfoRouter);
 app.use("/my/article", articleCateRouter);
-
+app.use("/my/article", articleRouter);
 // 全局错误中间件
 app.use((err, req, res, next) => {
   // 捕获验证出错
@@ -47,7 +51,10 @@ app.use((err, req, res, next) => {
   if (err.name === "UnauthorizedError") {
     return res.cc("身份认证失败");
   }
-  return res.cc("未知错误");
+  if (err instanceof multer.MulterError) {
+    return res.cc("请上传文件");
+  }
+  res.cc("未知错误");
 });
 
 app.listen(port, () => {
